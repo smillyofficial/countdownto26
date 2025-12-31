@@ -3,207 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Countdown!</title>
+    <title>2026 Countdown Party!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CARTOON STYLING --- */
+        /* --- ORIGINAL CARTOON STYLING --- */
         :root {
-            --bg-color: #2c0e37; /* Deep purple night sky */
+            --bg-color: #2c0e37;
             --card-bg: #ffffff;
             --text-color: #2c0e37;
             --accent-pink: #ff007f;
             --accent-cyan: #00f2ff;
             --accent-yellow: #ffea00;
+            --modal-bg: rgba(44, 14, 55, 0.9);
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            margin: 0; padding: 0; height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
             background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.1) 2px, transparent 2.5px),
-                radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.1) 2px, transparent 2.5px);
+            background-image: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.1) 2px, transparent 2.5px), radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.1) 2px, transparent 2.5px);
             background-size: 400px 400px;
             font-family: 'Fredoka One', cursive;
             overflow: hidden;
         }
 
         h1 {
-            color: var(--accent-yellow);
-            font-size: 3rem;
-            text-shadow: 4px 4px 0px var(--accent-pink);
-            margin-bottom: 40px;
-            letter-spacing: 2px;
-            transform: rotate(-2deg); /* Slight cartoon tilt */
-            text-align: center;
+            color: var(--accent-yellow); font-size: 3rem; text-shadow: 4px 4px 0px var(--accent-pink);
+            margin-bottom: 40px; letter-spacing: 2px; transform: rotate(-2deg); text-align: center;
         }
 
-        .countdown-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+        .countdown-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
 
         .time-box {
-            background: var(--card-bg);
-            border: 4px solid var(--accent-cyan);
-            border-radius: 20px;
-            padding: 20px;
-            min-width: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 10px 10px 0px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
+            background: var(--card-bg); border: 4px solid var(--accent-cyan); border-radius: 20px;
+            padding: 20px; min-width: 100px; display: flex; flex-direction: column; align-items: center;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.3); transition: transform 0.2s;
             animation: float 3s ease-in-out infinite;
         }
-
-        /* Stagger animations for a playful feel */
         .time-box:nth-child(1) { animation-delay: 0s; }
         .time-box:nth-child(2) { animation-delay: 0.5s; }
         .time-box:nth-child(3) { animation-delay: 1s; }
         .time-box:nth-child(4) { animation-delay: 1.5s; }
+        .time-box:hover { transform: scale(1.1) rotate(3deg) !important; border-color: var(--accent-pink); }
+        .number { font-size: 3.5rem; color: var(--text-color); line-height: 1; }
+        .label { font-size: 1rem; color: var(--accent-pink); text-transform: uppercase; margin-top: 10px; }
+        .confetti { position: absolute; width: 10px; height: 10px; background-color: var(--accent-cyan); animation: fall linear infinite; z-index: -1; }
 
-        .time-box:hover {
-            transform: scale(1.1) rotate(3deg) !important;
-            border-color: var(--accent-pink);
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+        @keyframes bounceSide { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-10px); } }
+
+        /* --- NEW: SIDE GAME BUTTON --- */
+        #game-btn-container {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            animation: bounceSide 2s ease-in-out infinite;
+            cursor: pointer;
         }
 
-        .number {
-            font-size: 3.5rem;
-            color: var(--text-color);
-            line-height: 1;
+        .game-btn {
+            background: var(--accent-yellow);
+            border: 4px solid var(--accent-pink);
+            padding: 15px;
+            border-radius: 50% 20% 50% 20%;
+            box-shadow: -5px 5px 0px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 120px;
+            transition: transform 0.2s;
+        }
+        
+        .game-btn:hover { transform: scale(1.1) rotate(-5deg); }
+        .game-icon { font-size: 2.5rem; }
+        .game-text { font-size: 1rem; color: var(--text-color); display: block; line-height: 1.2; margin-top: 5px; }
+
+        /* --- NEW: MODAL & GAMES --- */
+        #game-modal {
+            display: none; /* Hidden by default */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--modal-bg);
+            z-index: 100;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
         }
 
-        .label {
-            font-size: 1rem;
-            color: var(--accent-pink);
-            text-transform: uppercase;
-            margin-top: 10px;
+        .modal-content {
+            background: var(--card-bg);
+            width: 80%; max-width: 800px; height: 70vh;
+            border-radius: 30px; border: 5px solid var(--accent-cyan);
+            padding: 20px; position: relative;
+            box-shadow: 15px 15px 0px var(--accent-pink);
+            display: flex; flex-direction: column;
         }
 
-        /* Confetti Effect in Background */
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: var(--accent-cyan);
-            animation: fall linear infinite;
-            z-index: -1;
+        .close-btn {
+            position: absolute; top: -20px; right: -20px;
+            background: var(--accent-pink); color: white;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 2rem; line-height: 50px; text-align: center;
+            cursor: pointer; border: 4px solid white;
         }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+        .game-tabs { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
+        .tab-btn {
+            background: var(--accent-yellow); border: none; padding: 10px 20px;
+            font-family: 'Fredoka One'; font-size: 1.2rem; border-radius: 15px;
+            cursor: pointer; border: 3px solid var(--text-color);
+        }
+        .tab-btn.active { background: var(--accent-cyan); color: white; border-color: var(--accent-pink); }
+
+        .game-viewport {
+            flex-grow: 1; background: #eee; border-radius: 20px; border: 3px dashed var(--text-color);
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+            position: relative;
         }
 
-        @keyframes fall {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
-        }
+        .game-container { display: none; width: 100%; height: 100%; text-align: center; }
+        .game-container.active { display: flex; justify-content: center; align-items: center; flex-direction: column;}
+        
+        .placeholder-text { font-size: 1.5rem; color: #666; padding: 20px; }
+
+        /* Hidden YouTube Player */
+        #youtube-player { position: absolute; visibility: hidden; height: 0; width: 0; }
 
         /* Mobile Responsive */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             h1 { font-size: 2rem; }
             .number { font-size: 2.5rem; }
             .time-box { min-width: 70px; padding: 15px; }
             .countdown-container { gap: 10px; }
+            #game-btn-container { top: auto; bottom: 20px; right: 20px; transform: none; animation: bounceSide 2s ease-in-out infinite; }
+             .modal-content { width: 90%; height: 80vh; }
         }
     </style>
 </head>
 <body>
 
-    <div id="confetti-container"></div>
+    <div id="youtube-player"></div>
 
-    <h1>COUNTDOWN TO 2026</h1>
-
-    <div class="countdown-container">
-        <div class="time-box">
-            <span class="number" id="days">00</span>
-            <span class="label">Days</span>
-        </div>
-        
-        <div class="time-box">
-            <span class="number" id="hours">00</span>
-            <span class="label">Hours</span>
-        </div>
-
-        <div class="time-box">
-            <span class="number" id="minutes">00</span>
-            <span class="label">Mins</span>
-        </div>
-
-        <div class="time-box">
-            <span class="number" id="seconds">00</span>
-            <span class="label">Secs</span>
+    <div id="game-btn-container" onclick="openModal()">
+        <div class="game-btn">
+            <span class="game-icon">🎮</span>
+            <span class="game-text">click to play games till!!</span>
         </div>
     </div>
 
-    <script>
-        // --- JAVASCRIPT LOGIC ---
+    <div id="game-modal">
+        <div class="modal-content">
+            <div class="close-btn" onclick="closeModal()">X</div>
+            <h2>Chill Games</h2>
+            <div class="game-tabs">
+                <button class="tab-btn active" onclick="switchGame('snake')">Snake</button>
+                <button class="tab-btn" onclick="switchGame('mines')">Minesweeper</button>
+            </div>
 
+            <div class="game-viewport">
+                <div id="snake-game" class="game-container active">
+                     <div class="placeholder-text">
+                        🐍 <br> Snake Game Placeholder.<br>
+                        (Embed a JS Snake game here)
+                    </div>
+                </div>
+
+                <div id="mines-game" class="game-container">
+                     <div class="placeholder-text">
+                        💣 <br> Minesweeper Placeholder.<br>
+                        (Embed a JS Minesweeper game here)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <h1>COUNTDOWN TO 2026</h1>
+    <div class="countdown-container">
+        <div class="time-box"><span class="number" id="days">00</span><span class="label">Days</span></div>
+        <div class="time-box"><span class="number" id="hours">00</span><span class="label">Hours</span></div>
+        <div class="time-box"><span class="number" id="minutes">00</span><span class="label">Mins</span></div>
+        <div class="time-box"><span class="number" id="seconds">00</span><span class="label">Secs</span></div>
+    </div>
+
+    <script>
+        // --- 1. COUNTDOWN LOGIC ---
         function updateCountdown() {
             const now = new Date();
-            // This creates a date for Jan 1, 2026, 00:00:00 local client time
             const target = new Date(2026, 0, 1, 0, 0, 0); 
-            
             const diff = target - now;
-
             if (diff <= 0) {
-                // New Year has arrived!
                 document.querySelector("h1").innerText = "HAPPY NEW YEAR 2026!";
                 document.querySelector(".countdown-container").innerHTML = "<div class='time-box'><span class='number'>🎉</span></div>";
                 return;
             }
-
-            // Calculate time components
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-            // Update DOM with zero-padding
             document.getElementById("days").innerText = d < 10 ? "0" + d : d;
             document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
             document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
             document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
         }
-
-        // Run immediately and then every second
         updateCountdown();
         setInterval(updateCountdown, 1000);
 
-        // --- OPTIONAL: CREATE SIMPLE CONFETTI ---
+        // --- 2. YOUTUBE LOFI API ---
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '0', width: '0',
+                videoId: 'E0Om1LC-XeU', // The requested lofi video ID
+                playerVars: { 'autoplay': 1, 'loop': 1, 'controls': 0, 'showinfo': 0, 'playlist': 'E0Om1LC-XeU' },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+        function onPlayerReady(event) {
+            event.target.setVolume(50); // Set volume to 50%
+            event.target.playVideo();
+        }
+
+        // Load YouTube Iframe API asynchronously
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // Browser Autoplay Fix: Try to unmute/play on first user interaction anywhere
+        document.body.addEventListener('click', function() {
+            if(player && player.getPlayerState() !== 1) {
+                player.unMute();
+                player.playVideo();
+            }
+        }, {once:true});
+
+
+        // --- 3. MODAL & GAME TABS LOGIC ---
+        const modal = document.getElementById('game-modal');
+        const snakeContainer = document.getElementById('snake-game');
+        const minesContainer = document.getElementById('mines-game');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+
+        function openModal() {
+            modal.style.display = "flex";
+            // Ensure music plays when opening modal if it hasn't already
+            if(player) { player.unMute(); player.playVideo(); }
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        function switchGame(gameName) {
+            // Update Tabs styling
+            tabBtns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update visible container
+            snakeContainer.classList.remove('active');
+            minesContainer.classList.remove('active');
+
+            if (gameName === 'snake') {
+                snakeContainer.classList.add('active');
+            } else if (gameName === 'mines') {
+                minesContainer.classList.add('active');
+            }
+        }
+
+        // --- 4. CONFETTI ---
         function createConfetti() {
             const colors = ['#ff007f', '#00f2ff', '#ffea00', '#ffffff'];
             const container = document.body;
-            
             setInterval(() => {
                 const conf = document.createElement('div');
                 conf.classList.add('confetti');
                 conf.style.left = Math.random() * 100 + 'vw';
                 conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                conf.style.animationDuration = (Math.random() * 2 + 2) + 's'; // Random speed
-                
+                conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
                 container.appendChild(conf);
-
-                // Remove confetti after animation to prevent memory leak
-                setTimeout(() => {
-                    conf.remove();
-                }, 4000);
+                setTimeout(() => { conf.remove(); }, 4000);
             }, 300);
         }
-
         createConfetti();
     </script>
 </body>
